@@ -25,74 +25,68 @@ public class Color {
   /**
    * Default Construct. Construct a new Color object with the specified
    * intensity values for the red, green and blue components.
-   * 
-   * @param red
-   *          the intensity of the red component contributed to this Color.
-   * @param green
-   *          the intensity of the green component contributed to this Color.
-   * @param blue
-   *          the intensity of the blue component contributed to this Color.
+   *
+   * @param red   the intensity of the red component contributed to this Color.
+   * @param green the intensity of the green component contributed to this Color.
+   * @param blue  the intensity of the blue component contributed to this Color.
    */
   public Color(int red, int green, int blue) {
-    this.red = red;
-    this.green = green;
-    this.blue = blue;
+	this.red = red;
+	this.green = green;
+	this.blue = blue;
   }
 
   /**
    * Return the contribution of the red component to <tt>this</tt> Color.
-   * 
+   *
    * @return the intensity of the red component.
    */
   public int getRed() {
-    return red;
+	return red;
   }
 
   /**
    * Return the contribution of the green component to <tt>this</tt> Color.
-   * 
+   *
    * @return the intensity of the green component.
    */
   public int getGreen() {
-    return green;
+	return green;
   }
 
   /**
    * Return the contribution of the blue component to <tt>this</tt> Color.
-   * 
+   *
    * @return the intensity of the blue component.
    */
   public int getBlue() {
-    return blue;
+	return blue;
   }
 
   /**
    * Set the contribution of the red component to <tt>this</tt> Color.
-   * 
-   * @param red
-   *          the new intensity value of the red component.
+   *
+   * @param red the new intensity value of the red component.
    */
   public void setRed(int red) {
-    this.red = red;
+	this.red = red;
   }
 
   /**
    * Set the contribution of the green component to <tt>this</tt> Color.
-   * 
-   * @param green
-   *          the new intensity value of the green component.
+   *
+   * @param green the new intensity value of the green component.
    */
   public void setGreen(int green) {
-    this.green = green;
+	this.green = green;
   }
 
   /**
    * Set the contribution of the blue component to <tt>this</tt> Color.
-   * 
-   * @param blue
-   *          the new intensity value of the blue component.
+   *
+   * @param blue the new intensity value of the blue component.
    */
   public void setBlue(int blue) {
-    this.blue = blue;
+	this.blue = blue;
   }
 }

@@ -6,15 +6,15 @@ public class Tuple<X, Y> {
   private final Y y;
 
   public X getX() {
-    return x;
+	return x;
   }
 
   public Y getY() {
-    return y;
+	return y;
   }
 
   public Tuple(X x, Y y) {
-    this.x = x;
-    this.y = y;
+	this.x = x;
+	this.y = y;
   }
 }
