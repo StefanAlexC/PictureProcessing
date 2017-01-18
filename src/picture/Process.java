@@ -1,35 +1,47 @@
 package picture;
 
-import java.util.HashMap;
-
 public class Process {
 
-	public static Picture process(Option option, Picture inputPicture) {
+	public static Picture process(Command inputCommand) {
 
-		Picture outputPicture = createPicture(option, inputPicture);
+		Picture[] inputPictures = inputCommand.getInputPictures();
 
-		int height = inputPicture.getHeight() - 1;
-		int width  = inputPicture.getWidth() - 1;
+		Picture outputPicture = createPicture(inputCommand.getOption(), inputPictures);
 
-		for (int i = 0 ; i <= width ; i++)
-			for (int j = 0 ; j <= height ; j++) {
+		int height = outputPicture.getHeight() - 1;
+		int width = outputPicture.getWidth() - 1;
 
-				pixelInBounds(inputPicture, i, j);
+		for (int i = 0; i <= width; i++)
+			for (int j = 0; j <= height; j++) {
 
-					switch (option) {
-						case INVERT: outputPicture.setPixel(i, j, invertPixel(inputPicture.getPixel(i, j))); break;
-						case GRAYSCALE: outputPicture.setPixel(i, j, grayscalePixel(inputPicture.getPixel(i, j))); break;
-						case ROTATE90: pixelInBounds(outputPicture, j, i);
-						outputPicture.setPixel(height - j, i, inputPicture.getPixel(i, j)); break;
-						case FLIPV: outputPicture.setPixel(i, height - j, inputPicture.getPixel(i, j)); break;
-						case BLUR: {
-							if(marginPixel(width, height, i ,j))
-								outputPicture.setPixel(i, j, inputPicture.getPixel(i, j));
-							else
-								outputPicture.setPixel(i, j, blurPixel(i, j, inputPicture));
-							break;
-						}
+				switch (inputCommand.getOption()) {
+					case INVERT:
+						outputPicture.setPixel(i, j, invertPixel(inputPictures[0].getPixel(i, j)));
+						break;
+					case GRAYSCALE:
+						outputPicture.setPixel(i, j, grayscalePixel(inputPictures[0].getPixel(i, j)));
+						break;
+					case ROTATE270:
+					case ROTATE180:
+					case ROTATE90:
+						pixelInBounds(outputPicture, j, i);
+						outputPicture.setPixel(height - j, i, inputPictures[0].getPixel(i, j));
+						break;
+					case FLIPH:
+					case FLIPV:
+						outputPicture.setPixel(i, height - j, inputPictures[0].getPixel(i, j));
+						break;
+					case BLUR: {
+						if (marginPixel(width, height, i, j))
+							outputPicture.setPixel(i, j, inputPictures[0].getPixel(i, j));
+						else
+							outputPicture.setPixel(i, j, blurPixel(i, j, inputPictures[0]));
+						break;
 					}
+					case BLEND:
+						outputPicture.setPixel(i, j, addPixels(inputPictures, i, j));
+						break;
+				}
 
 			}
 
@@ -54,14 +66,14 @@ public class Process {
 		int average;
 
 		average = (currentPixel.getRed() +
-		           currentPixel.getBlue() +
-		           currentPixel.getGreen()) / 3;
+						currentPixel.getBlue() +
+						currentPixel.getGreen()) / 3;
 
 		return new Color(average, average, average);
 
 	}
 
-	private static Color blurPixel(int i, int j, Picture picture){
+	private static Color blurPixel(int i, int j, Picture picture) {
 
 		int dx[] = {-1, 0, 1, 1, 1, 0, -1, -1, 0};
 		int dy[] = {-1, -1, -1, 0, 1, 1, 1, 0, 0};
@@ -71,11 +83,11 @@ public class Process {
 		int green = 0;
 		int x, y;
 
-		for(int k = 0 ; k <= 8 ; k++){
+		for (int k = 0; k <= 8; k++) {
 			x = i + dx[k];
 			y = j + dy[k];
-			red   += picture.getPixel(x, y).getRed();
-			blue  += picture.getPixel(x, y).getBlue();
+			red += picture.getPixel(x, y).getRed();
+			blue += picture.getPixel(x, y).getBlue();
 			green += picture.getPixel(x, y).getGreen();
 		}
 
@@ -83,38 +95,31 @@ public class Process {
 
 	}
 
-	public static Picture blend(Picture[] inputPictures) {
-
-		Picture blendedPicture = blendedPicture(inputPictures);
-
-		int width = blendedPicture.getWidth();
-		int height = blendedPicture.getHeight();
-
-		for (int i = 0; i < width; i++)
-			for (int j = 0; j < height; j++) {
-				blendedPicture.setPixel(i, j, addPixels(inputPictures, i, j));
-			}
-
-		return blendedPicture;
-	}
-
-	private static Picture createPicture(Option option, Picture inputPicture) {
+	private static Picture createPicture(Option option, Picture[] inputPictures) {
 
 		switch (option) {
 			case BLUR:
 			case FLIPV:
 			case INVERT:
-			case GRAYSCALE: return Utils.createPicture(inputPicture.getWidth(), inputPicture.getHeight());
-			case ROTATE90: return Utils.createPicture(inputPicture.getHeight(), inputPicture.getWidth());
+			case GRAYSCALE:
+				return Utils.createPicture(inputPictures[0].getWidth(), inputPictures[0].getHeight());
+			case FLIPH:
+			case ROTATE270:
+			case ROTATE180:
+			case ROTATE90:
+				return Utils.createPicture(inputPictures[0].getHeight(), inputPictures[0].getWidth());
+			case BLEND:
+				return blendedPicture(inputPictures);
+
 		}
 
 		return null;
 	}
 
 	private static void pixelInBounds(Picture picture, int x, int y) {
-		if(!picture.contains(x, y))
+		if (!picture.contains(x, y))
 			System.err.println("Coordinates are not contained by the picture");
-	}
+	} //function used for testing
 
 	private static boolean marginPixel(int width, int height, int i, int j) {
 		return (i == 0) || (i == width) || (j == 0) || (j == height);
@@ -125,12 +130,12 @@ public class Process {
 		final int MAX_INT = 2000000000;
 		int minWidth = MAX_INT, minHeight = MAX_INT;
 
-		for(Picture p : inputPictures) {
+		for (Picture p : inputPictures) {
 
-			if(p.getHeight() < minHeight)
+			if (p.getHeight() < minHeight)
 				minHeight = p.getHeight();
 
-			if(p.getWidth() < minWidth)
+			if (p.getWidth() < minWidth)
 				minWidth = p.getWidth();
 
 		}
