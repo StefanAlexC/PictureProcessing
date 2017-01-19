@@ -18,6 +18,8 @@ public enum Option {
 
 	BLEND,
 
-	BLUR
+	BLUR,
+
+	MOSAIC
 
 }

@@ -1,16 +1,22 @@
 package picture;
 
 import java.util.ArrayList;
+import java.util.IntSummaryStatistics;
 
 public class Command {
 
 	private Option option;
+	private int tileSize;
 	private Picture[] inputPictures;
 	private String outputPath;
 
 	public Command(ArrayList<String> input){
 
 		option = stringToOption(input);
+		if(option == Option.MOSAIC) {
+			tileSize = Integer.parseInt(input.get(0));
+			input.remove(0);
+		}
 		inputPictures = fetchObjects(input);
 		outputPath = input.get(0);
 
@@ -36,6 +42,8 @@ public class Command {
 		return outputPath;
 	}
 
+	public int getTileSize() { return tileSize; }
+
 	public void setOption(Option option) {
 
 		this.option = option;
@@ -48,6 +56,21 @@ public class Command {
 		String setting = input.get(0);
 
 		switch (option) {
+
+			case "invert":    return Option.INVERT;
+			case "grayscale": return Option.GRAYSCALE;
+			case "blend":     return Option.BLEND;
+			case "blur":      return Option.BLUR;
+			case "mosaic":     return Option.MOSAIC;
+			case "flip": {
+				input.remove(0);
+				if (setting.equals("H"))
+					return Option.FLIPH;
+				else if (setting.equals("V"))
+					return Option.FLIPV;
+				else
+					System.err.println("Invalid Setting!");
+			}
 			case "rotate": {
 				input.remove(0);
 				if (setting.equals("90"))
@@ -56,23 +79,6 @@ public class Command {
 					return Option.ROTATE180;
 				else if (setting.equals("270"))
 					return Option.ROTATE270;
-				else
-					System.err.println("Invalid Setting!");
-			}
-			case "invert":
-				return Option.INVERT;
-			case "grayscale":
-				return Option.GRAYSCALE;
-			case "blend":
-				return Option.BLEND;
-			case "blur":
-				return Option.BLUR;
-			case "flip": {
-				input.remove(0);
-				if (setting.equals("H"))
-					return Option.FLIPH;
-				else if (setting.equals("V"))
-					return Option.FLIPV;
 				else
 					System.err.println("Invalid Setting!");
 			}

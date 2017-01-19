@@ -1,12 +1,14 @@
 package picture;
 
+import utils.Tuple;
+
 public class Process {
 
 	public static Picture process(Command inputCommand) {
 
 		Picture[] inputPictures = inputCommand.getInputPictures();
 
-		Picture outputPicture = createPicture(inputCommand.getOption(), inputPictures);
+		Picture outputPicture = createPicture(inputCommand, inputPictures);
 
 		int height = outputPicture.getHeight() - 1;
 		int width = outputPicture.getWidth() - 1;
@@ -41,8 +43,11 @@ public class Process {
 					case BLEND:
 						outputPicture.setPixel(i, j, addPixels(inputPictures, i, j));
 						break;
+					case MOSAIC:
+						outputPicture.setPixel(i, j, inputPictures[
+										mosaicImage(i, j, inputCommand.getTileSize(), inputPictures.length)
+										].getPixel(i,j));
 				}
-
 			}
 
 		return outputPicture;
@@ -95,25 +100,17 @@ public class Process {
 
 	}
 
-	private static Picture createPicture(Option option, Picture[] inputPictures) {
+	private static int mosaicImage(int x, int y, int tileSize, int pictureNumber) {
 
-		switch (option) {
-			case BLUR:
-			case FLIPV:
-			case INVERT:
-			case GRAYSCALE:
-				return Utils.createPicture(inputPictures[0].getWidth(), inputPictures[0].getHeight());
-			case FLIPH:
-			case ROTATE270:
-			case ROTATE180:
-			case ROTATE90:
-				return Utils.createPicture(inputPictures[0].getHeight(), inputPictures[0].getWidth());
-			case BLEND:
-				return blendedPicture(inputPictures);
+		return (y / tileSize + x / tileSize) % pictureNumber;
 
-		}
+	}
 
-		return null;
+	private static Picture createPicture(Command inputCommand, Picture[] inputPictures) {
+
+		Tuple<Integer, Integer> size = pictureSize(inputCommand, inputPictures);
+
+		return Utils.createPicture(size.getX(), size.getY());
 	}
 
 	private static void pixelInBounds(Picture picture, int x, int y) {
@@ -125,7 +122,7 @@ public class Process {
 		return (i == 0) || (i == width) || (j == 0) || (j == height);
 	}
 
-	private static Picture blendedPicture(Picture[] inputPictures) {
+	private static Tuple pictureSize(Command inputCommand, Picture[] inputPictures) {
 
 		final int MAX_INT = 2000000000;
 		int minWidth = MAX_INT, minHeight = MAX_INT;
@@ -139,7 +136,21 @@ public class Process {
 				minWidth = p.getWidth();
 
 		}
-		return Utils.createPicture(minWidth, minHeight);
+
+		switch (inputCommand.getOption()) {
+			case MOSAIC:   return adjustedSize(minWidth, minHeight, inputCommand.getTileSize());
+			case FLIPH:
+			case ROTATE270:
+			case ROTATE180:
+			case ROTATE90: return new Tuple(minHeight, minWidth);
+			default:       return new Tuple(minWidth, minHeight);
+		}
+	}
+
+	private static Tuple adjustedSize(int Width, int Height, int size) {
+
+		return new Tuple((Width / size) * size, (Height / size) * size);
+
 	}
 
 	private static Color addPixels(Picture[] inputPictures, int i, int j) {
@@ -158,4 +169,5 @@ public class Process {
 
 		return new Color(red, green, blue);
 	}
+
 }

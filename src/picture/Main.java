@@ -47,7 +47,6 @@ public class Main {
 
 	}
 
-
 	private static void parseArgs(String[] args, ArrayList input) {
 
 		for (String s : args) {
