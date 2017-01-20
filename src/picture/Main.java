@@ -33,7 +33,6 @@ public class Main {
 		Picture processedPicture;
 
 		switch (inputCommand.getOption()) {
-			case FLIPH:
 			case ROTATE270:
 				partialPicture = Process.process(inputCommand);
 				inputCommand = new Command(Option.ROTATE180, partialPicture, inputCommand.getOutputPath());

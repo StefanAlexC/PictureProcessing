@@ -10,8 +10,8 @@ public class Process {
 
 		Picture outputPicture = createPicture(inputCommand, inputPictures);
 
-		int height = outputPicture.getHeight() - 1;
-		int width = outputPicture.getWidth() - 1;
+		int height = intialiseHeight(inputCommand, outputPicture);
+		int width = intialiseWidth(inputCommand, outputPicture);
 
 		for (int i = 0; i <= width; i++)
 			for (int j = 0; j <= height; j++) {
@@ -26,10 +26,11 @@ public class Process {
 					case ROTATE270:
 					case ROTATE180:
 					case ROTATE90:
-						pixelInBounds(outputPicture, j, i);
 						outputPicture.setPixel(height - j, i, inputPictures[0].getPixel(i, j));
 						break;
 					case FLIPH:
+						outputPicture.setPixel(width - i, j, inputPictures[0].getPixel(i, j));
+						break;
 					case FLIPV:
 						outputPicture.setPixel(i, height - j, inputPictures[0].getPixel(i, j));
 						break;
@@ -113,11 +114,6 @@ public class Process {
 		return Utils.createPicture(size.getX(), size.getY());
 	}
 
-	private static void pixelInBounds(Picture picture, int x, int y) {
-		if (!picture.contains(x, y))
-			System.err.println("Coordinates are not contained by the picture");
-	} //function used for testing
-
 	private static boolean marginPixel(int width, int height, int i, int j) {
 		return (i == 0) || (i == width) || (j == 0) || (j == height);
 	}
@@ -139,7 +135,6 @@ public class Process {
 
 		switch (inputCommand.getOption()) {
 			case MOSAIC:   return adjustedSize(minWidth, minHeight, inputCommand.getTileSize());
-			case FLIPH:
 			case ROTATE270:
 			case ROTATE180:
 			case ROTATE90: return new Tuple(minHeight, minWidth);
@@ -170,4 +165,29 @@ public class Process {
 		return new Color(red, green, blue);
 	}
 
+	private static int intialiseWidth(Command inputCommand, Picture outputPicture) {
+
+		switch (inputCommand.getOption()) {
+			case ROTATE90:
+			case ROTATE180:
+			case ROTATE270:
+				return inputCommand.getInputPictures()[0].getWidth() - 1;
+			default:
+				return outputPicture.getWidth() - 1;
+		}
+
+	}
+
+	private static int intialiseHeight(Command inputCommand, Picture outputPicture) {
+
+		switch (inputCommand.getOption()) {
+			case ROTATE90:
+			case ROTATE180:
+			case ROTATE270:
+				return inputCommand.getInputPictures()[0].getHeight() - 1;
+			default:
+				return outputPicture.getHeight() - 1;
+		}
+
+	}
 }
